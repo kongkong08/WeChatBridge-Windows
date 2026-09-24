@@ -1,0 +1,71 @@
+.float-ball {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+  cursor: pointer;
+  background: transparent;
+}
+
+.ball-inner {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #6c5ce7, #a29bfe);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 16px rgba(108, 92, 231, 0.4);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  position: relative;
+}
+
+.float-ball.hover .ball-inner {
+  transform: scale(1.12);
+  box-shadow: 0 6px 24px rgba(108, 92, 231, 0.6);
+  outline: 3px dashed rgba(255, 255, 255, 0.8);
+  outline-offset: 4px;
+}
+
+.glyph {
+  color: #fff;
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.spinner {
+  width: 24px;
+  height: 24px;
+  border: 3px solid rgba(255, 255, 255, 0.4);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.float-ball.ok .ball-inner {
+  background: linear-gradient(135deg, #00b894, #55efc4);
+}
+
+.float-ball.error .ball-inner {
+  background: linear-gradient(135deg, #d63031, #ff7675);
+}
+
+.ball-tip {
+  position: absolute;
+  bottom: -22px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 11px;
+  color: #fff;
+  background: rgba(0, 0, 0, 0.7);
+  padding: 2px 8px;
+  border-radius: 8px;
+  white-space: nowrap;
+}

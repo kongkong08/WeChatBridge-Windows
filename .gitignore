@@ -1,0 +1,32 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+src-tauri/target/
+src-tauri/gen/schemas/
+
+# NSIS toolchain cache (large, re-downloadable)
+src-tauri/.nsis/
+src-tauri/.localappdata/
+
+# Build logs
+*.log
+src-tauri/cargo-test.log
+src-tauri/tauri-build*.log
+
+# Delivery binaries (too large for repo, attach to GitHub Releases)
+*.exe
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+
+# Tauri
+src-tauri/target/**
+
+# Upstream reference clone (macOS original)
+upstream/
