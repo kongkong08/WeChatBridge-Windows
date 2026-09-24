@@ -7,7 +7,7 @@ use std::fs;
 use std::path::{Path, PathBuf};
 
 use serde::Serialize;
-use tauri::State;
+use tauri::{Emitter, Manager, State};
 
 use crate::archive;
 use crate::batch::{BatchManifest, BatchState, ShareAction};
@@ -431,6 +431,33 @@ pub fn save_settings(
         manager.enable().map_err(|e| e.to_string())?;
     } else {
         manager.disable().map_err(|e| e.to_string())?;
+    }
+    // 通知悬浮球更新颜色/尺寸。
+    let _ = app.emit(
+        "settings-updated",
+        serde_json::json!({
+            "ballColor": settings.ball_color,
+            "ballSize": settings.ball_size,
+        }),
+    );
+    Ok(())
+}
+
+/// 显示悬浮球窗口。
+#[tauri::command]
+pub fn show_float_ball(app: tauri::AppHandle) -> Result<(), String> {
+    if let Some(w) = app.get_webview_window("float-ball") {
+        w.show().map_err(|e| e.to_string())?;
+        let _ = w.set_always_on_top(true);
+    }
+    Ok(())
+}
+
+/// 隐藏悬浮球窗口。
+#[tauri::command]
+pub fn hide_float_ball(app: tauri::AppHandle) -> Result<(), String> {
+    if let Some(w) = app.get_webview_window("float-ball") {
+        w.hide().map_err(|e| e.to_string())?;
     }
     Ok(())
 }

@@ -143,6 +143,54 @@ export default function SettingsPage() {
       </section>
 
       <section className="card">
+        <h2>悬浮球</h2>
+        <label className="row">
+          悬浮球大小
+          <span className="row-flex">
+            <input
+              type="range"
+              min={48}
+              max={120}
+              value={settings.ballSize}
+              onChange={(e) =>
+                updateSettings({ ballSize: Number(e.target.value) })
+              }
+            />
+            <span className="pill">{settings.ballSize}px</span>
+          </span>
+        </label>
+        <label className="row">
+          悬浮球颜色
+          <input
+            type="color"
+            value={settings.ballColor}
+            onChange={(e) => updateSettings({ ballColor: e.target.value })}
+          />
+        </label>
+        <div className="row-flex" style={{ gap: 8, marginTop: 4 }}>
+          <button
+            onClick={async () => {
+              await api.showFloatBall();
+              showToast("悬浮球已显示");
+            }}
+          >
+            显示悬浮球
+          </button>
+          <button
+            onClick={async () => {
+              await api.hideFloatBall();
+              showToast("悬浮球已隐藏（托盘可找回）");
+            }}
+          >
+            隐藏悬浮球
+          </button>
+        </div>
+        <p className="scene-summary" style={{ marginTop: 8 }}>
+          拖拽可移动位置 · 右键可隐藏 · 双击打开主窗口
+        </p>
+      </section>
+
+      <section className="card">
         <h2>转发目标</h2>
         {targets.map((t, i) => (
           <div className="target-row" key={t.id}>

@@ -89,10 +89,24 @@ pub struct AppSettings {
     /// 关闭主窗口时最小化到托盘而不是退出。
     #[serde(default = "default_true")]
     pub close_to_tray: bool,
+    /// 悬浮球尺寸（像素，直径）。
+    #[serde(default = "default_ball_size")]
+    pub ball_size: u32,
+    /// 悬浮球主题色（CSS 颜色，如 "#6c5ce7"）。
+    #[serde(default = "default_ball_color")]
+    pub ball_color: String,
 }
 
 fn default_language() -> String {
     "zh".to_string()
+}
+
+fn default_ball_size() -> u32 {
+    72
+}
+
+fn default_ball_color() -> String {
+    "#6c5ce7".to_string()
 }
 
 impl Default for AppSettings {
@@ -103,6 +117,8 @@ impl Default for AppSettings {
             obsidian_vault: None,
             autostart: false,
             close_to_tray: true,
+            ball_size: default_ball_size(),
+            ball_color: default_ball_color(),
         }
     }
 }

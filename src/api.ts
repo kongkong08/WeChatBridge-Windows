@@ -62,6 +62,10 @@ export const pickFile = (filters: [string, string[]][]) =>
 
 export const pickFolder = () => invoke<string | null>("pick_folder");
 
+// 悬浮球
+export const showFloatBall = () => invoke<void>("show_float_ball");
+export const hideFloatBall = () => invoke<void>("hide_float_ball");
+
 // 技能中心
 export const listSkills = () => invoke<SkillInfo[]>("list_skills");
 

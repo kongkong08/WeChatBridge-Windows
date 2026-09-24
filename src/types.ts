@@ -77,6 +77,8 @@ export interface AppSettings {
   obsidianVault: string | null;
   autostart: boolean;
   closeToTray: boolean;
+  ballSize: number;
+  ballColor: string;
 }
 
 export interface SkillInfo {

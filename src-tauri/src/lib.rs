@@ -129,6 +129,8 @@ pub fn run() {
             commands::save_scenes,
             commands::get_settings,
             commands::save_settings,
+            commands::show_float_ball,
+            commands::hide_float_ball,
             commands::save_targets,
             commands::pick_file,
             commands::pick_folder,
