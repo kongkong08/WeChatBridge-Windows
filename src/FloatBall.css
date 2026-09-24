@@ -11,6 +11,13 @@
   transition: opacity 0.6s ease;
 }
 
+/* 菜单模式：球停在窗口左上角，菜单占用右侧空间。 */
+.float-ball.menu-mode {
+  align-items: flex-start;
+  justify-content: flex-start;
+  cursor: default;
+}
+
 .float-ball.faded { opacity: 0.35; }
 .float-ball.faded:hover { opacity: 1; transition: opacity 0.15s ease; }
 
@@ -20,25 +27,34 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
   box-shadow:
     0 6px 20px rgba(0, 0, 0, 0.45),
     inset 0 1px 0 rgba(255, 255, 255, 0.25);
   transition: transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.18s ease;
 }
 
-.float-ball:hover .ball-inner {
-  transform: scale(1.06);
-}
+.float-ball:not(.menu-mode):hover .ball-inner { transform: scale(1.06); }
+.float-ball:not(.menu-mode):active .ball-inner { transform: scale(0.94); }
 
-.float-ball.over .ball-inner {
-  transform: scale(1.14);
-  box-shadow:
-    0 0 0 3px rgba(255, 255, 255, 0.85),
-    0 0 0 6px var(--ball-color, #07c160),
-    0 6px 24px rgba(0, 0, 0, 0.5);
-}
+.float-ball.over .ball-inner { transform: scale(1.12); }
 
-.float-ball:active .ball-inner { transform: scale(0.94); }
+/* 待处理批次：呼吸光环 */
+.float-ball.breathe .ball-inner {
+  animation: breathe 2.4s ease-in-out infinite;
+}
+@keyframes breathe {
+  0%, 100% {
+    box-shadow:
+      0 6px 20px rgba(0, 0, 0, 0.45),
+      0 0 0 0 color-mix(in srgb, var(--ball-color, #07c160) 55%, transparent);
+  }
+  50% {
+    box-shadow:
+      0 6px 20px rgba(0, 0, 0, 0.45),
+      0 0 0 9px transparent;
+  }
+}
 
 .glyph {
   color: #fff;
@@ -46,6 +62,11 @@
   font-weight: 700;
   line-height: 1;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+.glyph.pop { animation: pop 0.35s cubic-bezier(0.34, 1.56, 0.64, 1); }
+@keyframes pop {
+  0% { transform: scale(0.3); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
 }
 
 .spinner {
@@ -56,12 +77,81 @@
   border-radius: 50%;
   animation: spin 0.7s linear infinite;
 }
-
 @keyframes spin { to { transform: rotate(360deg); } }
 
+/* 成功：球变绿 + 波纹扩散 */
 .float-ball.ok .ball-inner { background: #16a34a; }
-.float-ball.error .ball-inner { background: #dc2626; }
+.ball-ripple {
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: var(--ball-size, 72px);
+  height: var(--ball-size, 72px);
+  border-radius: 50%;
+  border: 2px solid #16a34a;
+  animation: ripple 0.9s ease-out forwards;
+  pointer-events: none;
+}
+.ball-ripple.delay { animation-delay: 0.18s; }
+@keyframes ripple {
+  from { transform: scale(0.8); opacity: 0.9; }
+  to { transform: scale(1.9); opacity: 0; }
+}
 
+/* 失败：球变红 + 抖动 */
+.float-ball.error .ball-inner {
+  background: #dc2626;
+  animation: shake 0.4s ease-in-out;
+}
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-5px); }
+  40% { transform: translateX(5px); }
+  60% { transform: translateX(-3px); }
+  80% { transform: translateX(3px); }
+}
+
+/* 拖入：双层脉冲光环 */
+.pulse-ring {
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: var(--ball-size, 72px);
+  height: var(--ball-size, 72px);
+  border-radius: 50%;
+  border: 2px solid var(--ball-color, #07c160);
+  animation: pulse 1s ease-out infinite;
+  pointer-events: none;
+}
+.pulse-ring.delay { animation-delay: 0.5s; }
+@keyframes pulse {
+  from { transform: scale(1); opacity: 0.9; }
+  to { transform: scale(1.45); opacity: 0; }
+}
+
+/* 角标 */
+.ball-badge {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 4px;
+  border-radius: 9px;
+  background: #ef4444;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+  animation: pop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  pointer-events: none;
+}
+.menu-mode .ball-badge { display: none; }
+
+/* 提示气泡 */
 .ball-tip {
   position: absolute;
   bottom: -6px;
@@ -77,13 +167,19 @@
   pointer-events: none;
   animation: tip-in 0.15s ease-out;
 }
-
+.ball-tip.size {
+  bottom: auto;
+  top: -4px;
+  background: var(--ball-color, #07c160);
+  border: none;
+  font-weight: 700;
+}
 @keyframes tip-in {
   from { opacity: 0; transform: translateX(-50%) translateY(4px); }
   to { opacity: 1; transform: translateX(-50%) translateY(0); }
 }
 
-/* ---------- 右键菜单 ---------- */
+/* ---------- 右键菜单（开窗式，球右侧面板） ---------- */
 .ball-menu-mask {
   position: fixed;
   inset: 0;
@@ -92,81 +188,95 @@
 
 .ball-menu {
   position: absolute;
-  top: calc(100% + 2px);
-  left: 50%;
-  transform: translateX(-50%);
+  top: 0;
+  left: calc(var(--ball-size, 72px) + 8px);
+  width: 184px;
   background: #1c1f26;
   border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 12px;
-  padding: 6px;
+  border-radius: 14px;
+  padding: 10px;
   display: flex;
   flex-direction: column;
-  gap: 1px;
-  min-width: 160px;
+  gap: 6px;
   box-shadow: 0 12px 32px rgba(0, 0, 0, 0.55);
   z-index: 100;
-  animation: menu-in 0.12s ease-out;
+  animation: menu-in 0.16s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
-
 @keyframes menu-in {
-  from { opacity: 0; transform: translateX(-50%) scale(0.95); }
-  to { opacity: 1; transform: translateX(-50%) scale(1); }
+  from { opacity: 0; transform: translateX(-8px) scale(0.96); }
+  to { opacity: 1; transform: translateX(0) scale(1); }
 }
 
 .ball-menu-title {
   font-size: 10px;
   color: #8b93a3;
-  padding: 4px 10px 2px;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.05em;
+  padding: 0 2px;
 }
 
-.ball-menu-empty {
-  font-size: 12px;
-  color: #8b93a3;
-  padding: 6px 10px;
+.ball-menu-empty { font-size: 12px; color: #8b93a3; padding: 8px 2px; }
+
+.ball-menu-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
 }
 
-.ball-menu button {
+.target-cell {
   background: none;
   border: none;
-  color: #e8eaf0;
-  padding: 7px 10px;
-  font-size: 12px;
-  text-align: left;
-  border-radius: 7px;
+  border-radius: 10px;
+  padding: 6px 2px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
   cursor: pointer;
+  transition: background 0.12s, transform 0.12s;
+}
+.target-cell:hover { background: rgba(255, 255, 255, 0.07); transform: translateY(-1px); }
+.target-cell:active { transform: scale(0.94); }
+
+.target-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: #2a2f3a;
+  color: #cfd5df;
+  font-size: 15px;
+  font-weight: 700;
   display: flex;
   align-items: center;
-  gap: 8px;
-  transition: background 0.1s;
+  justify-content: center;
+  transition: box-shadow 0.15s;
+}
+.target-icon.on {
+  background: var(--ball-color, #07c160);
+  color: #fff;
+  box-shadow: 0 0 10px color-mix(in srgb, var(--ball-color, #07c160) 55%, transparent);
 }
 
-.ball-menu button:hover { background: rgba(255, 255, 255, 0.08); }
-
-.ball-menu .dot {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: #4a5160;
-  flex-shrink: 0;
-}
-.ball-menu .dot.on { background: #22c55e; box-shadow: 0 0 6px rgba(34, 197, 94, 0.7); }
-
-.ball-menu-sep {
-  height: 1px;
-  background: rgba(255, 255, 255, 0.08);
-  margin: 4px 6px;
+.target-name {
+  font-size: 10px;
+  color: #aab2c0;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-.ball-menu-sizes { display: flex; gap: 4px; padding: 2px 6px 4px; }
+.ball-menu-sep { height: 1px; background: rgba(255, 255, 255, 0.08); margin: 2px 0; }
 
-.size-btn {
+.ball-menu-actions { display: flex; gap: 6px; }
+.ball-menu-actions button {
   flex: 1;
-  padding: 5px 0 !important;
-  justify-content: center !important;
-  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #e8eaf0;
+  padding: 6px 0;
+  font-size: 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.12s;
 }
-.size-btn.active {
-  background: rgba(255, 255, 255, 0.12) !important;
-  border-color: rgba(255, 255, 255, 0.3) !important;
-}
+.ball-menu-actions button:hover { background: rgba(255, 255, 255, 0.12); }

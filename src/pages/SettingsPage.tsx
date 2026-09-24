@@ -205,7 +205,7 @@ export default function SettingsPage() {
           </button>
         </div>
         <p className="scene-summary" style={{ marginTop: 8 }}>
-          拖拽移动，松手自动贴边 · 右键快捷转发最近批次 / 调大小 / 隐藏 · 双击打开主窗口 · 空闲自动半透明
+          拖拽移动松手贴边 · 滚轮直接缩放 · 右键目标网格快捷转发 · 有待转发批次时呼吸光环+角标 · 双击开主窗口 · 空闲半透明
         </p>
       </section>
 
