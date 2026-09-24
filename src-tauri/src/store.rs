@@ -106,7 +106,7 @@ fn default_ball_size() -> u32 {
 }
 
 fn default_ball_color() -> String {
-    "#6c5ce7".to_string()
+    "#07c160".to_string()
 }
 
 impl Default for AppSettings {

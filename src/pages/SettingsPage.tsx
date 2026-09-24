@@ -161,11 +161,30 @@ export default function SettingsPage() {
         </label>
         <label className="row">
           悬浮球颜色
-          <input
-            type="color"
-            value={settings.ballColor}
-            onChange={(e) => updateSettings({ ballColor: e.target.value })}
-          />
+          <span className="row-flex">
+            {["#07c160", "#0a84ff", "#ff9f0a", "#ef4444", "#8e8e93"].map(
+              (c) => (
+                <button
+                  key={c}
+                  className="swatch"
+                  style={{
+                    background: c,
+                    outline:
+                      settings.ballColor.toLowerCase() === c
+                        ? "2px solid #fff"
+                        : "none",
+                  }}
+                  onClick={() => updateSettings({ ballColor: c })}
+                  aria-label={c}
+                />
+              ),
+            )}
+            <input
+              type="color"
+              value={settings.ballColor}
+              onChange={(e) => updateSettings({ ballColor: e.target.value })}
+            />
+          </span>
         </label>
         <div className="row-flex" style={{ gap: 8, marginTop: 4 }}>
           <button
@@ -186,7 +205,7 @@ export default function SettingsPage() {
           </button>
         </div>
         <p className="scene-summary" style={{ marginTop: 8 }}>
-          拖拽可移动位置 · 右键可隐藏 · 双击打开主窗口
+          拖拽移动，松手自动贴边 · 右键快捷转发最近批次 / 调大小 / 隐藏 · 双击打开主窗口 · 空闲自动半透明
         </p>
       </section>
 

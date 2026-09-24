@@ -16,12 +16,12 @@
   .hero {
     text-align: center;
     padding: 60px 20px 40px;
-    background: radial-gradient(ellipse at top, rgba(108,92,231,0.25), transparent 60%);
+    background: radial-gradient(ellipse at top, rgba(7, 193, 96,0.25), transparent 60%);
   }
   .hero h1 {
     font-size: 42px;
     font-weight: 800;
-    background: linear-gradient(135deg, #a29bfe, #74b9ff);
+    background: linear-gradient(135deg, #4ade80, #4ade80);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     margin-bottom: 12px;
@@ -29,9 +29,9 @@
   .hero p { font-size: 17px; color: #a0a0b8; max-width: 620px; margin: 0 auto 28px; line-height: 1.6; }
   .badge-row { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-bottom: 28px; }
   .badge {
-    background: rgba(108,92,231,0.15);
-    border: 1px solid rgba(108,92,231,0.3);
-    color: #c4bffd;
+    background: rgba(7, 193, 96,0.15);
+    border: 1px solid rgba(7, 193, 96,0.3);
+    color: #86efac;
     padding: 5px 14px;
     border-radius: 20px;
     font-size: 13px;
@@ -43,8 +43,8 @@
     text-decoration: none; cursor: pointer; border: none;
     transition: transform 0.15s, box-shadow 0.15s;
   }
-  .btn-primary { background: linear-gradient(135deg, #6c5ce7, #a29bfe); color: #fff; box-shadow: 0 4px 16px rgba(108,92,231,0.4); }
-  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 22px rgba(108,92,231,0.55); }
+  .btn-primary { background: linear-gradient(135deg, #07c160, #4ade80); color: #fff; box-shadow: 0 4px 16px rgba(7, 193, 96,0.4); }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 22px rgba(7, 193, 96,0.55); }
   .btn-ghost { background: rgba(255,255,255,0.06); color: #e8e8f0; border: 1px solid rgba(255,255,255,0.12); }
   .btn-ghost:hover { background: rgba(255,255,255,0.1); }
 
@@ -63,7 +63,7 @@
   }
   .step-label {
     position: absolute; top: 16px; left: 16px;
-    background: rgba(108,92,231,0.2); color: #c4bffd;
+    background: rgba(7, 193, 96,0.2); color: #86efac;
     padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 600;
     opacity: 0; transition: opacity 0.4s;
   }
@@ -89,28 +89,28 @@
     opacity: 0; transform: scale(0.8); transition: all 0.3s;
   }
   .wechat-zip.show { opacity: 1; transform: scale(1); }
-  .zip-icon { width: 24px; height: 24px; background: #6c5ce7; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; }
+  .zip-icon { width: 24px; height: 24px; background: #07c160; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; }
 
   /* Float ball */
   .ball {
     position: absolute; right: 60px; top: 50%; transform: translateY(-50%);
     width: 64px; height: 64px; border-radius: 50%;
-    background: linear-gradient(135deg, #6c5ce7, #a29bfe);
+    background: linear-gradient(135deg, #07c160, #4ade80);
     display: flex; align-items: center; justify-content: center;
     color: #fff; font-size: 26px; font-weight: 700;
-    box-shadow: 0 4px 20px rgba(108,92,231,0.5);
+    box-shadow: 0 4px 20px rgba(7, 193, 96,0.5);
     cursor: pointer;
   }
   .ball.pulse { animation: pulse 1.2s ease-in-out infinite; }
   @keyframes pulse {
-    0%, 100% { box-shadow: 0 4px 20px rgba(108,92,231,0.5); }
-    50% { box-shadow: 0 4px 32px rgba(108,92,231,0.9), 0 0 0 10px rgba(108,92,231,0.15); }
+    0%, 100% { box-shadow: 0 4px 20px rgba(7, 193, 96,0.5); }
+    50% { box-shadow: 0 4px 32px rgba(7, 193, 96,0.9), 0 0 0 10px rgba(7, 193, 96,0.15); }
   }
 
   /* Flying zip */
   .flying-zip {
     position: absolute; left: 200px; top: 180px;
-    width: 40px; height: 40px; background: #6c5ce7; border-radius: 6px;
+    width: 40px; height: 40px; background: #07c160; border-radius: 6px;
     display: flex; align-items: center; justify-content: center;
     color: #fff; font-size: 11px; font-weight: 700;
     opacity: 0; z-index: 10;
@@ -129,23 +129,23 @@
     opacity: 0; transform: translateY(20px); transition: all 0.5s;
   }
   .ai-target.show { opacity: 1; transform: translateY(0); }
-  .ai-target h4 { font-size: 13px; margin-bottom: 8px; color: #74b9ff; }
-  .ai-prompt { background: rgba(116,185,255,0.12); border-radius: 6px; padding: 6px 10px; font-size: 11px; color: #a0c4ff; margin-bottom: 6px; }
-  .ai-file { background: rgba(108,92,231,0.2); border-radius: 6px; padding: 6px 10px; font-size: 11px; color: #c4bffd; display: flex; align-items: center; gap: 6px; }
+  .ai-target h4 { font-size: 13px; margin-bottom: 8px; color: #4ade80; }
+  .ai-prompt { background: rgba(74,222,128,0.12); border-radius: 6px; padding: 6px 10px; font-size: 11px; color: #bbf7d0; margin-bottom: 6px; }
+  .ai-file { background: rgba(7, 193, 96,0.2); border-radius: 6px; padding: 6px 10px; font-size: 11px; color: #86efac; display: flex; align-items: center; gap: 6px; }
 
   .arrow-text {
     position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-    font-size: 14px; color: #6c5ce7; font-weight: 600;
+    font-size: 14px; color: #07c160; font-weight: 600;
     opacity: 0; transition: opacity 0.3s; white-space: nowrap;
   }
   .arrow-text.show { opacity: 1; }
 
   .controls { text-align: center; margin-top: 20px; }
   .replay {
-    background: rgba(108,92,231,0.15); color: #c4bffd; border: 1px solid rgba(108,92,231,0.3);
+    background: rgba(7, 193, 96,0.15); color: #86efac; border: 1px solid rgba(7, 193, 96,0.3);
     padding: 8px 20px; border-radius: 8px; cursor: pointer; font-size: 14px;
   }
-  .replay:hover { background: rgba(108,92,231,0.25); }
+  .replay:hover { background: rgba(7, 193, 96,0.25); }
 
   .features {
     max-width: 960px; margin: 0 auto 60px; padding: 0 20px;
@@ -154,12 +154,12 @@
   .feature {
     background: #16162a; border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 20px;
   }
-  .feature h3 { font-size: 15px; margin-bottom: 8px; color: #c4bffd; }
+  .feature h3 { font-size: 15px; margin-bottom: 8px; color: #86efac; }
   .feature p { font-size: 13px; color: #a0a0b8; line-height: 1.6; }
   .feature-icon { font-size: 24px; margin-bottom: 10px; }
 
   footer { text-align: center; padding: 30px 20px; color: #60607a; font-size: 13px; }
-  footer a { color: #a29bfe; text-decoration: none; }
+  footer a { color: #4ade80; text-decoration: none; }
 </style>
 </head>
 <body>

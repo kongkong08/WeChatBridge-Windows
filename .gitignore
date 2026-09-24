@@ -30,3 +30,6 @@ src-tauri/target/**
 
 # Upstream reference clone (macOS original)
 upstream/
+
+# Local design skill references
+.refs/

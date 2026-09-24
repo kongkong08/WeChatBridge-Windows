@@ -25,6 +25,7 @@ export default function RecordsPage() {
   const [targets, setTargets] = useState<TargetStatus[]>([]);
   const [scenes, setScenes] = useState<WeChatScene[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [checkedIds, setCheckedIds] = useState<Set<string>>(new Set());
   const [preview, setPreview] = useState<Preview | null>(null);
   const [targetId, setTargetId] = useState<string>("claude");
   const [sceneId, setSceneId] = useState<string>("");
@@ -155,6 +156,52 @@ export default function RecordsPage() {
     await refresh();
   }
 
+  function toggleCheck(id: string) {
+    setCheckedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }
+
+  async function doBatchForward() {
+    if (checkedIds.size === 0) return;
+    setBusy(true);
+    let ok = 0;
+    let fail = 0;
+    for (const id of checkedIds) {
+      try {
+        await api.forwardBatch(id, targetId, sceneId || null);
+        ok++;
+      } catch {
+        fail++;
+      }
+    }
+    showToast(
+      `批量转发完成：成功 ${ok} 个${fail ? `，失败 ${fail} 个` : ""}`,
+    );
+    setCheckedIds(new Set());
+    await refresh();
+    setBusy(false);
+  }
+
+  async function doBatchDelete() {
+    if (checkedIds.size === 0) return;
+    setBusy(true);
+    for (const id of checkedIds) {
+      await api.deleteBatch(id).catch(() => {});
+    }
+    if (selectedId && checkedIds.has(selectedId)) {
+      setSelectedId(null);
+      setPreview(null);
+    }
+    showToast(`已删除 ${checkedIds.size} 个批次`);
+    setCheckedIds(new Set());
+    await refresh();
+    setBusy(false);
+  }
+
   const selected = batches.find((b) => b.id === selectedId) ?? null;
   const enabledTargets = targets.filter((t) => t.enabled && t.id !== "custom");
 
@@ -190,7 +237,7 @@ export default function RecordsPage() {
               <b>保存 ZIP</b>：在元宝AI聊天窗口里，把生成的 ZIP 文件另存到本地（或直接拖出）。
             </li>
             <li>
-              <b>拖入悬浮球</b>：把 ZIP 拖到屏幕上的紫色「微」字悬浮球，或拖到上方区域，即可导入并转发到任意 AI。
+              <b>拖入悬浮球</b>：把 ZIP 拖到屏幕上的绿色「微」字悬浮球，或拖到上方区域，即可导入并转发到任意 AI。
             </li>
           </ol>
         </section>
@@ -198,7 +245,38 @@ export default function RecordsPage() {
 
       <div className="records-body">
         <section className="batch-list">
-          <h2>批次记录</h2>
+          <div className="batch-list-head">
+            <h2>批次记录</h2>
+            {batches.length > 0 && (
+              <button
+                className="link-btn"
+                onClick={() =>
+                  setCheckedIds(
+                    checkedIds.size === batches.length
+                      ? new Set()
+                      : new Set(batches.map((b) => b.id)),
+                  )
+                }
+              >
+                {checkedIds.size === batches.length ? "取消全选" : "全选"}
+              </button>
+            )}
+          </div>
+          {checkedIds.size > 0 && (
+            <div className="batch-toolbar">
+              <span className="pill">已选 {checkedIds.size}</span>
+              <button
+                className="primary"
+                disabled={busy}
+                onClick={doBatchForward}
+              >
+                批量转发
+              </button>
+              <button disabled={busy} onClick={doBatchDelete}>
+                批量删除
+              </button>
+            </div>
+          )}
           {batches.length === 0 && <p className="empty">还没有归档记录</p>}
           {batches.map((b) => (
             <div
@@ -209,6 +287,13 @@ export default function RecordsPage() {
               onClick={() => select(b.id)}
             >
               <div className="batch-row">
+                <input
+                  type="checkbox"
+                  className="batch-check"
+                  checked={checkedIds.has(b.id)}
+                  onClick={(e) => e.stopPropagation()}
+                  onChange={() => toggleCheck(b.id)}
+                />
                 <span className="batch-name">{b.displayName}</span>
                 <span className={`state state-${b.state}`}>
                   {STATE_LABEL[b.state]}

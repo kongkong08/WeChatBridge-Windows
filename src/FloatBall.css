@@ -1,6 +1,6 @@
 .float-ball {
-  width: var(--ball-size, 72px);
-  height: var(--ball-size, 72px);
+  width: 100vw;
+  height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -8,104 +8,165 @@
   cursor: grab;
   background: transparent;
   position: relative;
+  transition: opacity 0.6s ease;
 }
 
-.float-ball.dragging {
-  cursor: grabbing;
-}
+.float-ball.faded { opacity: 0.35; }
+.float-ball.faded:hover { opacity: 1; transition: opacity 0.15s ease; }
 
 .ball-inner {
   border-radius: 50%;
-  background: linear-gradient(135deg, var(--ball-color, #6c5ce7), var(--ball-color, #6c5ce7)cc);
+  background: var(--ball-color, #07c160);
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 4px 16px color-mix(in srgb, var(--ball-color, #6c5ce7) 45%, transparent);
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
-  position: relative;
+  box-shadow:
+    0 6px 20px rgba(0, 0, 0, 0.45),
+    inset 0 1px 0 rgba(255, 255, 255, 0.25);
+  transition: transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.18s ease;
 }
 
 .float-ball:hover .ball-inner {
-  transform: scale(1.08);
-  box-shadow: 0 6px 22px color-mix(in srgb, var(--ball-color, #6c5ce7) 60%, transparent);
+  transform: scale(1.06);
 }
 
-.float-ball.dragging .ball-inner {
-  transform: scale(0.95);
-  opacity: 0.85;
+.float-ball.over .ball-inner {
+  transform: scale(1.14);
+  box-shadow:
+    0 0 0 3px rgba(255, 255, 255, 0.85),
+    0 0 0 6px var(--ball-color, #07c160),
+    0 6px 24px rgba(0, 0, 0, 0.5);
 }
+
+.float-ball:active .ball-inner { transform: scale(0.94); }
 
 .glyph {
   color: #fff;
   font-size: 22px;
   font-weight: 700;
   line-height: 1;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
 }
 
 .spinner {
   width: 22px;
   height: 22px;
-  border: 3px solid rgba(255, 255, 255, 0.4);
+  border: 3px solid rgba(255, 255, 255, 0.35);
   border-top-color: #fff;
   border-radius: 50%;
-  animation: spin 0.8s linear infinite;
+  animation: spin 0.7s linear infinite;
 }
 
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
+@keyframes spin { to { transform: rotate(360deg); } }
 
-.float-ball.ok .ball-inner {
-  background: linear-gradient(135deg, #00b894, #55efc4);
-}
-
-.float-ball.error .ball-inner {
-  background: linear-gradient(135deg, #d63031, #ff7675);
-}
+.float-ball.ok .ball-inner { background: #16a34a; }
+.float-ball.error .ball-inner { background: #dc2626; }
 
 .ball-tip {
   position: absolute;
-  bottom: -22px;
+  bottom: -6px;
   left: 50%;
   transform: translateX(-50%);
   font-size: 11px;
   color: #fff;
-  background: rgba(0, 0, 0, 0.75);
-  padding: 2px 8px;
+  background: rgba(12, 14, 18, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  padding: 3px 9px;
   border-radius: 8px;
   white-space: nowrap;
   pointer-events: none;
+  animation: tip-in 0.15s ease-out;
+}
+
+@keyframes tip-in {
+  from { opacity: 0; transform: translateX(-50%) translateY(4px); }
+  to { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+
+/* ---------- 右键菜单 ---------- */
+.ball-menu-mask {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
 }
 
 .ball-menu {
   position: absolute;
-  top: 100%;
+  top: calc(100% + 2px);
   left: 50%;
   transform: translateX(-50%);
-  margin-top: 8px;
-  background: #2a2a3e;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 8px;
-  padding: 4px;
+  background: #1c1f26;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 6px;
   display: flex;
   flex-direction: column;
-  gap: 2px;
-  min-width: 110px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  gap: 1px;
+  min-width: 160px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.55);
   z-index: 100;
+  animation: menu-in 0.12s ease-out;
+}
+
+@keyframes menu-in {
+  from { opacity: 0; transform: translateX(-50%) scale(0.95); }
+  to { opacity: 1; transform: translateX(-50%) scale(1); }
+}
+
+.ball-menu-title {
+  font-size: 10px;
+  color: #8b93a3;
+  padding: 4px 10px 2px;
+  letter-spacing: 0.04em;
+}
+
+.ball-menu-empty {
+  font-size: 12px;
+  color: #8b93a3;
+  padding: 6px 10px;
 }
 
 .ball-menu button {
   background: none;
   border: none;
-  color: #e8e8f0;
-  padding: 6px 10px;
+  color: #e8eaf0;
+  padding: 7px 10px;
   font-size: 12px;
   text-align: left;
-  border-radius: 4px;
+  border-radius: 7px;
   cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: background 0.1s;
 }
 
-.ball-menu button:hover {
-  background: rgba(255, 255, 255, 0.1);
+.ball-menu button:hover { background: rgba(255, 255, 255, 0.08); }
+
+.ball-menu .dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #4a5160;
+  flex-shrink: 0;
+}
+.ball-menu .dot.on { background: #22c55e; box-shadow: 0 0 6px rgba(34, 197, 94, 0.7); }
+
+.ball-menu-sep {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.08);
+  margin: 4px 6px;
+}
+
+.ball-menu-sizes { display: flex; gap: 4px; padding: 2px 6px 4px; }
+
+.size-btn {
+  flex: 1;
+  padding: 5px 0 !important;
+  justify-content: center !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+.size-btn.active {
+  background: rgba(255, 255, 255, 0.12) !important;
+  border-color: rgba(255, 255, 255, 0.3) !important;
 }
