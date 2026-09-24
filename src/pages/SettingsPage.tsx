@@ -198,13 +198,36 @@ export default function SettingsPage() {
           <button
             onClick={async () => {
               await api.hideFloatBall();
-              showToast("悬浮球已隐藏（托盘可找回）");
+              showToast("悬浮球已隐藏（托盘或 Ctrl+Shift+W 找回）");
             }}
           >
             隐藏悬浮球
           </button>
         </div>
-        <p className="scene-summary" style={{ marginTop: 8 }}>
+        <label className="row">
+          拖入后自动转发到
+          <select
+            value={settings.autoForwardTarget ?? ""}
+            onChange={(e) =>
+              updateSettings({
+                autoForwardTarget: e.target.value || null,
+              })
+            }
+          >
+            <option value="">关闭（仅导入，打开主窗口）</option>
+            {targets
+              .filter((t) => t.enabled && t.id !== "custom")
+              .map((t) => (
+                <option key={t.id} value={t.id}>
+                  {t.displayName}
+                </option>
+              ))}
+          </select>
+        </label>
+        <p className="scene-summary" style={{ marginTop: 4 }}>
+          开启后拖入 ZIP 即完成「导入 + 转发」全流程，无需打开主窗口。全局快捷键：Ctrl+Shift+W 显示/隐藏悬浮球，Ctrl+Shift+M 打开主窗口。
+        </p>
+        <p className="scene-summary" style={{ marginTop: 4 }}>
           拖拽移动松手贴边 · 滚轮直接缩放 · 右键目标网格快捷转发 · 有待转发批次时呼吸光环+角标 · 双击开主窗口 · 空闲半透明
         </p>
       </section>

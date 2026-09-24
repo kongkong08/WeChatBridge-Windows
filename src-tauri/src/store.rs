@@ -92,9 +92,12 @@ pub struct AppSettings {
     /// 悬浮球尺寸（像素，直径）。
     #[serde(default = "default_ball_size")]
     pub ball_size: u32,
-    /// 悬浮球主题色（CSS 颜色，如 "#6c5ce7"）。
+    /// 悬浮球主题色（CSS 颜色，如 "#07c160"）。
     #[serde(default = "default_ball_color")]
     pub ball_color: String,
+    /// 拖入悬浮球后自动转发到的目标 id（None = 仅导入，打开主窗口）。
+    #[serde(default)]
+    pub auto_forward_target: Option<String>,
 }
 
 fn default_language() -> String {
@@ -119,6 +122,7 @@ impl Default for AppSettings {
             close_to_tray: true,
             ball_size: default_ball_size(),
             ball_color: default_ball_color(),
+            auto_forward_target: None,
         }
     }
 }

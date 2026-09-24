@@ -39,6 +39,10 @@ export default function FloatBall() {
   const [faded, setFaded] = useState(false);
   const [pendingCount, setPendingCount] = useState(0);
   const [sizeTip, setSizeTip] = useState("");
+  const [collapsed, setCollapsed] = useState(false);
+  const autoForward = useRef<string | null>(null);
+  const expandedPos = useRef<{ x: number; y: number } | null>(null);
+  const collapseTimer = useRef<number | undefined>(undefined);
   const suppressClick = useRef(false);
   const idleTimer = useRef<number | undefined>(undefined);
   const statusTimer = useRef<number | undefined>(undefined);
@@ -47,6 +51,12 @@ export default function FloatBall() {
 
   const win = getCurrentWindow();
 
+  // 上次转发目标（记忆）。
+  const lastTarget = {
+    get: () => localStorage.getItem("wcb:lastTarget"),
+    set: (id: string) => localStorage.setItem("wcb:lastTarget", id),
+  };
+
   // 初始加载设置 + 监听设置变更。
   useEffect(() => {
     api
@@ -54,15 +64,20 @@ export default function FloatBall() {
       .then((s) => {
         setBallColor(s.ballColor || "#07c160");
         setBallSize(s.ballSize || 72);
+        autoForward.current = s.autoForwardTarget;
       })
       .catch(() => {});
-    const unlisten = listen<{ ballColor?: string; ballSize?: number }>(
-      "settings-updated",
-      (e) => {
-        if (e.payload.ballColor) setBallColor(e.payload.ballColor);
-        if (e.payload.ballSize) setBallSize(e.payload.ballSize);
-      },
-    );
+    const unlisten = listen<{
+      ballColor?: string;
+      ballSize?: number;
+      autoForwardTarget?: string | null;
+    }>("settings-updated", (e) => {
+      if (e.payload.ballColor) setBallColor(e.payload.ballColor);
+      if (e.payload.ballSize) setBallSize(e.payload.ballSize);
+      if ("autoForwardTarget" in e.payload) {
+        autoForward.current = e.payload.autoForwardTarget ?? null;
+      }
+    });
     return () => {
       unlisten.then((f) => f());
     };
@@ -138,6 +153,24 @@ export default function FloatBall() {
         try {
           const m = await api.importZip(zip);
           refreshPending();
+          // 自动转发：拖入即完成全流程，无需打开主窗口。
+          if (autoForward.current) {
+            setMsg("自动转发中…");
+            try {
+              const scenes = await api.listScenes();
+              const r = await api.forwardBatch(
+                m.id,
+                autoForward.current,
+                scenes.defaultSceneId,
+              );
+              lastTarget.set(autoForward.current);
+              refreshPending();
+              flash("ok", r.message.slice(0, 16), 2200);
+            } catch (err) {
+              flash("error", String(err).slice(0, 24), 2600);
+            }
+            return;
+          }
           flash("ok", `已接收 ${m.displayName.slice(0, 12)}`, 1400);
           setTimeout(() => showMain(), 800);
         } catch (err) {
@@ -155,6 +188,7 @@ export default function FloatBall() {
   const startDrag = async (e: React.MouseEvent) => {
     if (e.button !== 0 || menuOpen) return;
     resetIdle();
+    setCollapsed(false); // 拖拽即退出半隐藏
     try {
       await win.startDragging();
       suppressClick.current = true;
@@ -162,6 +196,51 @@ export default function FloatBall() {
       await snapToEdge();
     } catch {
       /* 权限或平台不支持时忽略 */
+    }
+  };
+
+  // 半隐藏：球一半藏到屏幕边缘外，悬停自动展开。
+  const collapseToEdge = async () => {
+    try {
+      const pos = await win.outerPosition();
+      const monitor = await currentMonitor();
+      if (!monitor) return;
+      const scale = monitor.scaleFactor;
+      const mw = monitor.size.width / scale;
+      const x = pos.x / scale;
+      const y = pos.y / scale;
+      expandedPos.current = { x, y };
+      const onLeft = x + ballSize / 2 < mw / 2;
+      const cx = onLeft ? -(ballSize / 2) : mw - ballSize / 2;
+      await win.setPosition(new LogicalPosition(cx, y));
+      setCollapsed(true);
+    } catch {
+      /* 忽略 */
+    }
+  };
+
+  const expandBall = async () => {
+    window.clearTimeout(collapseTimer.current);
+    if (collapsed && expandedPos.current) {
+      await win
+        .setPosition(
+          new LogicalPosition(expandedPos.current.x, expandedPos.current.y),
+        )
+        .catch(() => {});
+      setCollapsed(false);
+    }
+  };
+
+  // 悬停展开；移出后若在半隐藏模式则延时收起。
+  const onMouseEnterBall = () => {
+    resetIdle();
+    void expandBall();
+  };
+  const onMouseLeaveBall = () => {
+    if (expandedPos.current && !menuOpen) {
+      collapseTimer.current = window.setTimeout(() => {
+        void collapseToEdge();
+      }, 900);
     }
   };
 
@@ -255,17 +334,42 @@ export default function FloatBall() {
     }
   };
 
-  // 菜单动作：快捷转发最近批次 / 打开主窗口 / 隐藏 / 尺寸预设。
+  // 菜单动作：快捷转发最近批次 / 打开主窗口 / 隐藏 / 复制 / 半隐藏。
   const runAction = async (key: string, kind: "target" | "action") => {
     await closeMenu();
     if (kind === "action") {
       if (key === "open") await showMain();
+      if (key === "collapse") {
+        expandedPos.current = { x: 0, y: 0 }; // 标记进入半隐藏模式
+        await collapseToEdge();
+      }
       if (key === "hide") {
         // 走 Rust 命令隐藏（前端 win.hide() 受窗口权限链路影响，可能静默失败）。
         try {
           await api.hideFloatBall();
         } catch {
           await win.hide().catch(() => {});
+        }
+      }
+      if (key === "copy") {
+        setStatus("loading");
+        setMsg("复制中…");
+        try {
+          const batches = await api.listBatches();
+          const latest = batches[0];
+          if (!latest) {
+            flash("error", "暂无批次");
+            return;
+          }
+          const scenes = await api.listScenes();
+          const r = await api.forwardBatch(
+            latest.id,
+            "clipboard",
+            scenes.defaultSceneId,
+          );
+          flash("ok", r.message.slice(0, 16), 1800);
+        } catch (err) {
+          flash("error", String(err).slice(0, 24), 2400);
         }
       }
       return;
@@ -281,6 +385,7 @@ export default function FloatBall() {
       }
       const scenes = await api.listScenes();
       const r = await api.forwardBatch(latest.id, key, scenes.defaultSceneId);
+      lastTarget.set(key);
       refreshPending();
       flash("ok", r.message.slice(0, 16), 2000);
     } catch (err) {
@@ -311,8 +416,9 @@ export default function FloatBall() {
         } as React.CSSProperties
       }
       onMouseDown={startDrag}
-      onMouseEnter={resetIdle}
+      onMouseEnter={onMouseEnterBall}
       onMouseMove={resetIdle}
+      onMouseLeave={onMouseLeaveBall}
       onWheel={onWheel}
       onClick={() => {
         if (!suppressClick.current && !menuOpen) void showMain();
@@ -367,24 +473,33 @@ export default function FloatBall() {
               <div className="ball-menu-empty">暂无可用目标</div>
             )}
             <div className="ball-menu-grid">
-              {menuTargets.map((t) => (
-                <button
-                  key={t.id}
-                  className="target-cell"
-                  onClick={() => runAction(t.id, "target")}
-                  title={t.displayName}
-                >
-                  <span
-                    className={`target-icon ${t.running || t.id === "obsidian" ? "on" : ""}`}
+              {[...menuTargets]
+                .sort((a, b) =>
+                  a.id === lastTarget.get() ? -1 : b.id === lastTarget.get() ? 1 : 0,
+                )
+                .map((t) => (
+                  <button
+                    key={t.id}
+                    className={`target-cell ${t.id === lastTarget.get() ? "last" : ""}`}
+                    onClick={() => runAction(t.id, "target")}
+                    title={`${t.displayName}${t.id === lastTarget.get() ? "（上次使用）" : ""}`}
                   >
-                    {targetGlyph(t.displayName)}
-                  </span>
-                  <span className="target-name">{t.displayName}</span>
-                </button>
-              ))}
+                    <span
+                      className={`target-icon ${t.running || t.id === "obsidian" ? "on" : ""}`}
+                    >
+                      {targetGlyph(t.displayName)}
+                    </span>
+                    <span className="target-name">
+                      {t.displayName}
+                      {t.id === lastTarget.get() ? " ★" : ""}
+                    </span>
+                  </button>
+                ))}
             </div>
             <div className="ball-menu-sep" />
             <div className="ball-menu-actions">
+              <button onClick={() => runAction("copy", "action")}>复制</button>
+              <button onClick={() => runAction("collapse", "action")}>半隐藏</button>
               <button onClick={() => runAction("open", "action")}>主窗口</button>
               <button onClick={() => runAction("hide", "action")}>隐藏</button>
             </div>

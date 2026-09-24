@@ -79,6 +79,7 @@ export interface AppSettings {
   closeToTray: boolean;
   ballSize: number;
   ballColor: string;
+  autoForwardTarget: string | null;
 }
 
 export interface SkillInfo {

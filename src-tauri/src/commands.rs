@@ -432,12 +432,13 @@ pub fn save_settings(
     } else {
         manager.disable().map_err(|e| e.to_string())?;
     }
-    // 通知悬浮球更新颜色/尺寸。
+    // 通知悬浮球更新颜色/尺寸/自动转发目标。
     let _ = app.emit(
         "settings-updated",
         serde_json::json!({
             "ballColor": settings.ball_color,
             "ballSize": settings.ball_size,
+            "autoForwardTarget": settings.auto_forward_target,
         }),
     );
     Ok(())

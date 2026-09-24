@@ -1,6 +1,6 @@
 [package]
 name = "wechatbridge-windows"
-version = "0.1.0"
+version = "0.2.0"
 description = "WeChatBridge for Windows - forward WeChat chat archives to AI agents and Obsidian"
 authors = ["WeChatBridge Windows contributors"]
 license = "MIT"
@@ -30,6 +30,7 @@ regex = "1"
 chrono = { version = "0.4", features = ["serde"] }
 uuid = { version = "1", features = ["v4", "serde"] }
 tauri-plugin-dialog = "2"
+tauri-plugin-global-shortcut = "2"
 
 [target.'cfg(windows)'.dependencies]
 windows = { version = "0.58", features = [

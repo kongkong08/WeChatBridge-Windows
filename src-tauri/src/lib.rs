@@ -15,6 +15,7 @@ pub mod win32;
 use tauri::menu::{Menu, MenuItem};
 use tauri::tray::{MouseButton, MouseButtonState, TrayIconBuilder, TrayIconEvent};
 use tauri::{Manager, WebviewUrl, WebviewWindowBuilder, WindowEvent};
+use tauri_plugin_global_shortcut::{Code, GlobalShortcutExt, Modifiers, Shortcut, ShortcutState};
 
 /// 显示并聚焦主窗口。
 fn show_main_window(app: &tauri::AppHandle) {
@@ -22,6 +23,22 @@ fn show_main_window(app: &tauri::AppHandle) {
         let _ = window.show();
         let _ = window.unminimize();
         let _ = window.set_focus();
+    }
+}
+
+/// 切换悬浮球显示/隐藏。
+fn toggle_float_ball(app: &tauri::AppHandle) {
+    if let Some(w) = app.get_webview_window("float-ball") {
+        match w.is_visible() {
+            Ok(true) => {
+                let _ = w.hide();
+            }
+            _ => {
+                let _ = w.show();
+                let _ = w.set_always_on_top(true);
+                let _ = w.set_focus();
+            }
+        }
     }
 }
 
@@ -50,6 +67,22 @@ pub fn run() {
             // 单实例：二次启动时聚焦已有窗口。
             show_main_window(app);
         }))
+        .plugin(
+            // 全局快捷键：Ctrl+Shift+W 切换悬浮球，Ctrl+Shift+M 打开主窗口。
+            tauri_plugin_global_shortcut::Builder::new()
+                .with_handler(|app, shortcut, event| {
+                    if event.state() != ShortcutState::Pressed {
+                        return;
+                    }
+                    let mods = Modifiers::CONTROL | Modifiers::SHIFT;
+                    if shortcut.matches(mods, Code::KeyW) {
+                        toggle_float_ball(app);
+                    } else if shortcut.matches(mods, Code::KeyM) {
+                        show_main_window(app);
+                    }
+                })
+                .build(),
+        )
         .plugin(tauri_plugin_autostart::init(
             tauri_plugin_autostart::MacosLauncher::LaunchAgent,
             None::<Vec<&str>>,
@@ -99,6 +132,13 @@ pub fn run() {
                 tray = tray.icon(icon.clone());
             }
             tray.build(app)?;
+
+            // 注册全局快捷键。
+            let mods = Modifiers::CONTROL | Modifiers::SHIFT;
+            app.global_shortcut()
+                .register(Shortcut::new(Some(mods), Code::KeyW))?;
+            app.global_shortcut()
+                .register(Shortcut::new(Some(mods), Code::KeyM))?;
 
             // 拖拽悬浮球：始终置顶，接收从微信/资源管理器拖入的 ZIP。
             create_float_ball(app.handle())?;
