@@ -41,7 +41,10 @@ cargo test --lib     # Rust 单元测试（27 个）
 npm run tauri build  # 产出便携版 exe（target/release/wechatbridge-windows.exe）
 ```
 
-## 致谢
+## 致谢与参考
 
-- 原项目：[freestylefly/WeChatBridge](https://github.com/freestylefly/WeChatBridge)，MIT License。
-- 本仓库同样以 MIT 发布。
+> 本项目是对原 macOS 项目 **[freestylefly/WeChatBridge](https://github.com/freestylefly/WeChatBridge)** 的 Windows 平台移植与适配。
+>
+> - 行为规格、场景库、Obsidian 归档格式、粘贴计划（提示词优先 + 文件送达）等核心设计均移植自原项目。
+> - 原项目以 **MIT License** 开源，本仓库同样以 MIT 发布。
+> - 感谢原作者 freestylefly 的优秀工作。
