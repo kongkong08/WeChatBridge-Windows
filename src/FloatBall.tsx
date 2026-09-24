@@ -260,7 +260,14 @@ export default function FloatBall() {
     await closeMenu();
     if (kind === "action") {
       if (key === "open") await showMain();
-      if (key === "hide") await win.hide();
+      if (key === "hide") {
+        // 走 Rust 命令隐藏（前端 win.hide() 受窗口权限链路影响，可能静默失败）。
+        try {
+          await api.hideFloatBall();
+        } catch {
+          await win.hide().catch(() => {});
+        }
+      }
       return;
     }
     setStatus("loading");

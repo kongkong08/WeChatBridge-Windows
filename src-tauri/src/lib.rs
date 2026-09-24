@@ -58,11 +58,13 @@ pub fn run() {
         .plugin(tauri_plugin_dialog::init())
         .manage(state)
         .setup(|app| {
-            // 系统托盘：显示主窗口 / 显示悬浮球 / 退出。
+            // 系统托盘：显示主窗口 / 显示悬浮球 / 隐藏悬浮球 / 退出。
             let show = MenuItem::with_id(app, "show", "显示主窗口", true, None::<&str>)?;
             let ball = MenuItem::with_id(app, "ball", "显示悬浮球", true, None::<&str>)?;
+            let ball_hide =
+                MenuItem::with_id(app, "ball_hide", "隐藏悬浮球", true, None::<&str>)?;
             let quit = MenuItem::with_id(app, "quit", "退出", true, None::<&str>)?;
-            let menu = Menu::with_items(app, &[&show, &ball, &quit])?;
+            let menu = Menu::with_items(app, &[&show, &ball, &ball_hide, &quit])?;
             let mut tray = TrayIconBuilder::new()
                 .menu(&menu)
                 .tooltip("微信流 WeChatBridge")
@@ -71,6 +73,13 @@ pub fn run() {
                     "ball" => {
                         if let Some(w) = app.get_webview_window("float-ball") {
                             let _ = w.show();
+                            let _ = w.set_always_on_top(true);
+                            let _ = w.set_focus();
+                        }
+                    }
+                    "ball_hide" => {
+                        if let Some(w) = app.get_webview_window("float-ball") {
+                            let _ = w.hide();
                         }
                     }
                     "quit" => app.exit(0),
