@@ -332,13 +332,17 @@ export default function SettingsPage() {
       <section className="card about">
         <h2>关于</h2>
         <p>
-          微信流 WeChatBridge for Windows · v0.1.0
+          微信流 WeChatBridge for Windows · v0.2.0
           <br />
           基于开源项目{" "}
+          <a href="https://github.com/qzz0518/Dukou" target="_blank">
+            Dukou（渡口）
+          </a>{" "}
+          二次开发，感谢原作者 qzz0518；同时致谢{" "}
           <a href="https://github.com/freestylefly/WeChatBridge" target="_blank">
             freestylefly/WeChatBridge
           </a>{" "}
-          （MIT）重写。聊天内容只来自用户主动导出的文件，全部数据保存在本机。
+          （MIT）。聊天内容只来自用户主动导出的文件，全部数据保存在本机。
         </p>
       </section>
 

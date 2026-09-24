@@ -67,8 +67,10 @@ npm run tauri build  # 产出便携版 exe（target/release/wechatbridge-windows
 
 ## 致谢与参考
 
-> 本项目是对原 macOS 项目 **[freestylefly/WeChatBridge](https://github.com/freestylefly/WeChatBridge)** 的 Windows 平台移植与适配。
+> 本项目基于开源项目 **[Dukou（渡口）](https://github.com/qzz0518/Dukou)** 二次开发，感谢原作者 **qzz0518** 的开创性工作——开源太伟大了。
 >
-> - 行为规格、场景库、Obsidian 归档格式、粘贴计划（提示词优先 + 文件送达）等核心设计均移植自原项目。
-> - 原项目以 **MIT License** 开源，本仓库同样以 MIT 发布。
-> - 感谢原作者 freestylefly 的优秀工作。
+> 同时感谢 macOS 项目 **[freestylefly/WeChatBridge](https://github.com/freestylefly/WeChatBridge)**（同为基于 Dukou 的二次开发）：
+>
+> - 行为规格、场景库、Obsidian 归档格式、粘贴计划（提示词优先 + 文件送达）等核心设计移植自上述项目。
+> - Dukou 与 freestylefly/WeChatBridge 均以 **MIT License** 开源，本仓库同样以 MIT 发布。
+> - 站在开源的肩膀上，才能把微信聊天记录送到更远的地方。
